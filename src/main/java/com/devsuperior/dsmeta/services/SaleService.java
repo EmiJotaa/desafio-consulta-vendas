@@ -9,11 +9,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.devsuperior.dsmeta.dto.SaleMinDTO;
 import com.devsuperior.dsmeta.dto.SaleSummaryDTO;
 import com.devsuperior.dsmeta.entities.Sale;
+import com.devsuperior.dsmeta.projections.SaleMinProjection;
 import com.devsuperior.dsmeta.repositories.SaleRepository;
 
 @Service
@@ -31,21 +34,64 @@ public class SaleService {
 	public List<SaleSummaryDTO> searchSummary(String minDate, String maxDate) {
 		
 		try {
-			if (minDate == null) {
-				LocalDate result = LocalDate.parse(maxDate).minusYears(1L);
-				minDate = result.toString();
+			LocalDate startDate = null;
+			LocalDate endDate = null;
+			
+			if (minDate != null) {
+				startDate = LocalDate.parse(minDate);
+				minDate = startDate.toString();
+			} else {
+				startDate = LocalDate.ofInstant(Instant.now(), ZoneId.systemDefault()).minusYears(1L);
+				minDate = startDate.toString();
 			}
 			
-			if (maxDate == null) {
-				LocalDate today = LocalDate.ofInstant(Instant.now(), ZoneId.systemDefault());
-				maxDate = today.toString();
+			
+			if (maxDate != null) {
+				endDate = LocalDate.parse(maxDate);
+				maxDate = endDate.toString();
+			} else {
+				endDate = LocalDate.ofInstant(Instant.now(), ZoneId.systemDefault());
+				maxDate = endDate.toString();
 			}
 			
 			List<SaleSummaryDTO> list = repository.searchSummary(LocalDate.parse(minDate),
 					LocalDate.parse(maxDate));
 			List<SaleSummaryDTO> dto = list.stream().map(x -> new SaleSummaryDTO(x)).collect(Collectors.toList());
-			
 			return dto;
+			
+		} catch (DateTimeParseException e) {
+			throw new IllegalArgumentException("Formato de data inválido");
+		}
+	}
+	
+public Page<SaleMinDTO> searchSales(String minDate, String maxDate, String name, Pageable pageable) {
+		
+		try {
+			
+			LocalDate startDate = null;
+			LocalDate endDate = null;
+			
+			if (minDate != null) {
+				startDate = LocalDate.parse(minDate);
+				minDate = startDate.toString();
+			} else {
+				startDate = LocalDate.ofInstant(Instant.now(), ZoneId.systemDefault()).minusYears(1L);
+				minDate = startDate.toString();
+			}
+			
+			if (maxDate != null) {
+				endDate = LocalDate.parse(maxDate);
+				maxDate = endDate.toString();
+			} else {
+				endDate = LocalDate.ofInstant(Instant.now(), ZoneId.systemDefault());
+				maxDate = endDate.toString();
+			}
+			
+			Page<SaleMinProjection> result = repository.searchSales(LocalDate.parse(minDate),
+					LocalDate.parse(maxDate), name, pageable);			
+			Page<SaleMinDTO> dto = result.map(x -> new SaleMinDTO(x));
+			return dto;
+			
 		} catch (DateTimeParseException e) {
 			throw new IllegalArgumentException("Formato de data inválido");
 		}

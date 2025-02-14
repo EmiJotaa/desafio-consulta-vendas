@@ -35,6 +35,13 @@ public class SaleMinDTO {
 		name = x.getSellerName();
 		amount = x.total;
 	}
+	
+	public SaleMinDTO(SaleMinDTO x) {
+		id = x.getId();
+		date = x.getDate();
+		amount = x.getAmount();
+		name = x.getName();
+	}
 
 	public Long getId() {
 		return id;
