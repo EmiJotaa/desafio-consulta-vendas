@@ -19,9 +19,10 @@ public class SaleMinDTO {
 	}
 	
 	public SaleMinDTO(Sale entity) {
-		id = entity.getId();
+		id = entity.getSeller().getId();
 		amount = entity.getAmount();
 		date = entity.getDate();
+		name = entity.getSeller().getName();
 	}
 	
 	public SaleMinDTO(SaleMinProjection projection) {

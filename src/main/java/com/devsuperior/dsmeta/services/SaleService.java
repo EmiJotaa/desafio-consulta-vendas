@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import com.devsuperior.dsmeta.dto.SaleMinDTO;
 import com.devsuperior.dsmeta.dto.SaleSummaryDTO;
 import com.devsuperior.dsmeta.entities.Sale;
-import com.devsuperior.dsmeta.projections.SaleMinProjection;
 import com.devsuperior.dsmeta.repositories.SaleRepository;
 
 @Service
@@ -87,7 +86,7 @@ public Page<SaleMinDTO> searchSales(String minDate, String maxDate, String name,
 				maxDate = endDate.toString();
 			}
 			
-			Page<SaleMinProjection> result = repository.searchSales(LocalDate.parse(minDate),
+			Page<Sale> result = repository.searchSales(LocalDate.parse(minDate),
 					LocalDate.parse(maxDate), name, pageable);			
 			Page<SaleMinDTO> dto = result.map(x -> new SaleMinDTO(x));
 			return dto;
